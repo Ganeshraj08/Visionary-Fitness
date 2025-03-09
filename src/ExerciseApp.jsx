@@ -610,7 +610,7 @@ const ExerciseApp = () => {
         ctx.beginPath();
         ctx.moveTo(kpA.x, kpA.y);
         ctx.lineTo(kpB.x, kpB.y);
-        ctx.strokeStyle = "orange";
+        ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
         ctx.stroke();
       }
@@ -728,17 +728,17 @@ const ExerciseApp = () => {
           {" "}
           {/* Reduced p-6 to p-5 and mb-12 to mb-10 */}
           <div className="flex items-center gap-3">
-            <Activity className="w-12 h-12 text-red-500 animate-pulse" />
+            <Activity className="w-12 h-12 text-sky-400 " />
             <h1 className="text-2xl font-extrabold text-white tracking-tighter">
               {" "}
               {/* Reduced text-3xl to text-2xl */}
-              FIT<span className="text-red-500">FLOW</span>
+              VISIONARY <span className=" text-sky-400">FITNESS</span>
             </h1>
           </div>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowHistory(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-600/90 transition-all duration-300 font-bold uppercase tracking-wider text-xs"
+              className="flex items-center gap-2 px-5 py-2.5 bg-sky-400 text-white rounded-lg hover:bg-sky-600/90 transition-all duration-300 font-bold uppercase tracking-wider text-xs"
             >
               <History className="w-5 h-5" />
               History
@@ -747,7 +747,7 @@ const ExerciseApp = () => {
               <div className="flex items-center gap-2 bg-zinc-800 px-5 py-2.5 rounded-lg text-white border border-zinc-700">
                 {" "}
                 {/* Reduced px-6 to px-5 and py-3 to py-2.5 */}
-                <Timer className="w-5 h-5 text-red-500" />
+                <Timer className="w-5 h-5 text-sky-400" />
                 <span className="font-mono text-lg">{timer}s</span>{" "}
                 {/* Reduced text-xl to text-lg */}
               </div>
@@ -847,7 +847,7 @@ const ExerciseApp = () => {
                     <Line
                       type="monotone"
                       dataKey="calories"
-                      stroke="#dc2626"
+                      stroke="#38bdf8"
                       strokeWidth={2}
                       name="Calories Burned"
                     />
@@ -869,11 +869,11 @@ const ExerciseApp = () => {
                         {" "}
                         {/* Reduced gap-6 to gap-5 */}
                         <span className="flex items-center gap-2 text-zinc-300">
-                          <Timer className="w-4 h-4 text-red-500" />
+                          <Timer className="w-4 h-4 text-sky-400" />
                           {workout.duration}s
                         </span>
                         <span className="flex items-center gap-2 text-zinc-300">
-                          <Flame className="w-4 h-4 text-red-500" />
+                          <Flame className="w-4 h-4 text-sky-400" />
                           {workout.calories.toFixed(1)} cal
                         </span>
                       </div>
@@ -913,7 +913,7 @@ const ExerciseApp = () => {
                   {/* Reduced p-6 to p-5 */}
                   <span className="font-medium text-white">Total Time:</span>
                   <span className="flex items-center gap-2 text-zinc-300">
-                    <Timer className="w-5 h-5 text-red-500" />
+                    <Timer className="w-5 h-5 text-sky-400" />
                     {workoutSummary.duration}s
                   </span>
                 </div>
@@ -924,7 +924,7 @@ const ExerciseApp = () => {
                     Calories Burned:
                   </span>
                   <span className="flex items-center gap-2 text-zinc-300">
-                    <Flame className="w-5 h-5 text-red-500" />
+                    <Flame className="w-5 h-5 text-sky-400" />
                     {workoutSummary.calories.toFixed(1)}
                   </span>
                 </div>
@@ -951,7 +951,7 @@ const ExerciseApp = () => {
               </div>
               <button
                 onClick={() => setWorkoutSummary(null)}
-                className="w-full px-5 py-3 bg-red-600 text-white rounded-xl font-bold uppercase tracking-wider hover:bg-red-500 transition-colors"
+                className="w-full px-5 py-3 bg-sky-600 text-white rounded-xl font-bold uppercase tracking-wider hover:bg-red-500 transition-colors"
               >
                 Close
               </button>
@@ -962,12 +962,12 @@ const ExerciseApp = () => {
           <div className="text-center py-20 animate-fadeIn backdrop-blur-sm bg-black/30 rounded-3xl border border-zinc-800">
             {" "}
             {/* Reduced py-24 to py-20 */}
-            <Dumbbell className="w-24 h-24 text-red-500 mx-auto mb-6 animate-bounce" />{" "}
+            <Dumbbell className="w-24 h-24 text-sky-400 mx-auto mb-6 animate-bounce" />{" "}
             {/* Reduced mb-8 to mb-6 */}
             <h2 className="text-4xl font-extrabold text-white mb-5 tracking-tight">
               {" "}
               {/* Reduced text-5xl to text-4xl and mb-6 to mb-5 */}
-              Ready to <span className="text-red-500">Transform</span>?
+              Ready to <span className="text-sky-400">Transform</span>?
             </h2>
             <p className="text-zinc-300 mb-10 text-lg">
               {" "}
@@ -976,8 +976,8 @@ const ExerciseApp = () => {
             </p>
             <button
               onClick={startWorkout}
-              className="px-8 py-5 bg-red-600 text-white rounded-xl font-bold text-lg uppercase tracking-wider
-                shadow-lg shadow-red-500/20 hover:bg-red-600/90   "
+              className="px-8 py-5 bg-sky-600 text-white rounded-xl font-bold text-lg uppercase tracking-wider
+                shadow-lg shadow-sky-400/20 hover:bg-sky-600/90   "
             >
               Start Your Journey
             </button>
@@ -1013,7 +1013,7 @@ const ExerciseApp = () => {
                         key={exercise.name}
                         className={`rounded-xl p-5 transition-all duration-300 ${
                           index === currentExerciseIndex
-                            ? "bg-red-600/20 border-2 border-red-500"
+                            ? "bg-sky-600/20 border-2 border-sky-500"
                             : "bg-zinc-800/50 border border-zinc-700"
                         }`}
                       >
@@ -1088,7 +1088,7 @@ const ExerciseApp = () => {
                             {" "}
                             {/* Reduced mt-4 to mt-3 */}
                             <div
-                              className="bg-red-500 h-2 rounded-full transition-all duration-300"
+                              className="bg-sky-400 h-2 rounded-full transition-all duration-300"
                               style={{ width: `${progress}%` }}
                             />
                           </div>
