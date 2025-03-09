@@ -1,0 +1,342 @@
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import Webcam from "react-webcam";
+import * as tf from "@tensorflow/tfjs";
+import * as poseDetection from "@tensorflow-models/pose-detection";
+
+const ExerciseApp = () => {
+  const workoutPlan = [
+    { name: "Pushups", reps: 10 },
+    { name: "Squats", reps: 15 },
+    { name: "Pullups", reps: 8 },
+    { name: "Dumbbell Curls", reps: 12 },
+    { name: "Jumping Jacks", reps: 20 },
+  ];
+
+  const webcamRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [detector, setDetector] = useState(null);
+  const [exerciseCount, setExerciseCount] = useState({
+    pushups: 0,
+    squats: 0,
+    pullups: 0,
+    "dumbbell curls": 0,
+    "jumping jacks": 0, // Add dumbbell curls count
+  });
+  const [currentExercise, setCurrentExercise] = useState("");
+  const [pullupPosition, setPullupPosition] = useState("up");
+  const [pushupPosition, setPushupPosition] = useState("up");
+  const [squatPosition, setSquatPosition] = useState("up");
+  const [dumbbellCurlPosition, setDumbbellCurlPosition] = useState("down");
+  const [jumpingJackPosition, setJumpingJackPosition] = useState("down");
+  const isExerciseInProgressRef = useRef(false);
+
+  const detectExercise = useCallback(
+    (keypoints) => {
+      if (!keypoints) return;
+
+      const keypointsMap = {};
+      keypoints.forEach((kp) => {
+        keypointsMap[kp.name] = kp;
+      });
+
+      try {
+        if (currentExercise === "Pushups") {
+          detectPushup(keypointsMap);
+        } else if (currentExercise === "Squats") {
+          detectSquat(keypointsMap);
+        } else if (currentExercise === "Pullups") {
+          detectPullup(keypointsMap);
+        } else if (currentExercise === "Dumbbell Curls") {
+          detectDumbbellCurl(keypointsMap);
+        } else if (currentExercise === "Jumping Jacks") {
+          detectJumpingJacks(keypointsMap); // Add jumping jacks detection
+        }
+      } catch (error) {
+        console.error("Error in detectExercise:", error);
+      }
+    },
+    [currentExercise]
+  );
+
+  useEffect(() => {
+    const loadModel = async () => {
+      await tf.ready();
+      const detectorConfig = {
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+      };
+      const moveNet = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        detectorConfig
+      );
+      setDetector(moveNet);
+      console.log("MoveNet model loaded!");
+    };
+
+    loadModel();
+  }, []);
+
+  const detectPose = useCallback(async () => {
+    if (!detector || !webcamRef.current) return;
+
+    const video = webcamRef.current.video;
+    if (!video) return;
+
+    try {
+      const poses = await detector.estimatePoses(video, {
+        flipHorizontal: false,
+      });
+
+      if (poses.length > 0) {
+        console.log("Detected Pose:", poses[0]);
+        drawPose(poses[0], 640, 480);
+        detectExercise(poses[0].keypoints);
+      } else {
+        console.warn("No poses detected");
+      }
+    } catch (error) {
+      console.error("Error estimating poses:", error);
+    }
+
+    requestAnimationFrame(detectPose);
+  }, [detectExercise, detector]);
+
+  useEffect(() => {
+    if (detector) {
+      detectPose();
+    }
+  }, [detector, detectPose]);
+
+  const calculateAngle = (a, b, c) => {
+    const radians =
+      Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+    let angle = Math.abs((radians * 180.0) / Math.PI);
+    if (angle > 180.0) angle = 360 - angle;
+    return angle;
+  };
+
+  const detectJumpingJacks = (keypointsMap) => {
+    //exercise tracking & count updation
+  };
+
+  const detectPushup = (keypointsMap) => {
+    //exercise tracking & count updation
+  };
+
+  const detectSquat = (keypointsMap) => {
+    //exercise tracking & count updation
+  };
+
+  const detectPullup = (keypointsMap) => {
+    //exercise tracking and exercise count updation
+  };
+
+  const detectDumbbellCurl = (keypointsMap) => {
+   
+   //exercise
+    
+  };
+
+  const drawPose = (pose, videoWidth, videoHeight) => {
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+
+    const canvas = canvasRef.current;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!pose || !pose.keypoints) return;
+
+    const scaleX = canvas.width / videoWidth;
+    const scaleY = canvas.height / videoHeight;
+
+    const flippedKeypoints = pose.keypoints.map((keypoint) => ({
+      ...keypoint,
+      x: (videoWidth - keypoint.x) * scaleX,
+      y: keypoint.y * scaleY,
+    }));
+
+    flippedKeypoints.forEach((keypoint) => {
+      if (keypoint.score > 0.3) {
+        ctx.beginPath();
+        ctx.arc(keypoint.x, keypoint.y, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = "red";
+        ctx.fill();
+      }
+    });
+
+    const skeleton = [
+      ["nose", "left_eye"],
+      ["nose", "right_eye"],
+      ["left_eye", "left_ear"],
+      ["right_eye", "right_ear"],
+      ["left_shoulder", "right_shoulder"],
+      ["left_shoulder", "left_elbow"],
+      ["right_shoulder", "right_elbow"],
+      ["left_elbow", "left_wrist"],
+      ["right_elbow", "right_wrist"],
+      ["left_hip", "right_hip"],
+      ["left_hip", "left_knee"],
+      ["right_hip", "right_knee"],
+      ["left_knee", "left_ankle"],
+      ["right_knee", "right_ankle"],
+    ];
+
+    const keypointsMap = {};
+    flippedKeypoints.forEach((kp) => {
+      keypointsMap[kp.name] = kp;
+    });
+
+    skeleton.forEach(([partA, partB]) => {
+      const kpA = keypointsMap[partA];
+      const kpB = keypointsMap[partB];
+
+      if (kpA && kpB && kpA.score > 0.2 && kpB.score > 0.2) {
+        ctx.beginPath();
+        ctx.moveTo(kpA.x, kpA.y);
+        ctx.lineTo(kpB.x, kpB.y);
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    });
+  };
+
+  const handleExerciseChange = (exercise) => {
+    setCurrentExercise(exercise);
+    setPushupPosition("up"); // Reset pushup position
+    setSquatPosition("up"); // Reset squat position
+    setPullupPosition("up"); // Reset pullup position
+    setDumbbellCurlPosition("down"); // Reset dumbbell curl position
+    setJumpingJackPosition("down"); // Reset jumping jack position
+
+    isExerciseInProgressRef.current = false; // Reset progress flag
+  };
+
+  return (
+    <>
+      <h1>
+        {currentExercise} Count: {exerciseCount[currentExercise.toLowerCase()]}.
+        Position:{" "}
+        {currentExercise === "Pushups"
+          ? pushupPosition
+          : currentExercise === "Squats"
+          ? squatPosition
+          : currentExercise === "Pullups"
+          ? pullupPosition
+          : currentExercise === "Dumbbell Curls"
+          ? dumbbellCurlPosition
+          : jumpingJackPosition}{" "}
+        {/* Add jumping jack position */}
+      </h1>
+      {/*<div>
+        <button onClick={() => handleExerciseChange("Pushups")}>
+          Push-ups
+        </button>
+        <button onClick={() => handleExerciseChange("Squats")}>Squats</button>
+        <button onClick={() => handleExerciseChange("Pullups")}>
+          Pull-ups
+        </button>
+        <button onClick={() => handleExerciseChange("Dumbbell Curls")}>
+          Dumbbell Curls
+        </button>
+        <button onClick={() => handleExerciseChange("Jumping Jacks")}>
+          Jumping Jacks
+        </button>{" "}
+        
+      </div> */}
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          position: "relative",
+          width: "640px",
+          height: "480px",
+          textAlign: "center",
+        }}
+      >
+        <Webcam
+          ref={webcamRef}
+          videoConstraints={{
+            facingMode: "user",
+            width: 640,
+            height: 480,
+          }}
+          audio={false}
+          screenshotFormat="image/jpeg"
+          onUser
+          MediaError={(e) => console.log("Webcam Error:", e)}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            transform: "scaleX(-1)",
+            objectFit: "cover",
+          }}
+        />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "transparent",
+          }}
+        />
+      </div>
+
+      <div>
+        {workoutPlan.map((exercise) => (
+          <div
+            style={
+              exercise.name === currentExercise
+                ? { backgroundColor: "lightblue", color: "navy" }
+                : {}
+
+            }
+            key={exercise.name}
+            className="exercise-tab"
+          >
+            <h2>
+              {exercise.name} - {exercise.reps} reps
+            </h2>
+            <button onClick={() => handleExerciseChange(exercise.name)}>
+              Start {exercise.name}
+            </button>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
+export default ExerciseApp;
+
+
+---------------------------------
+
+<span className="text-indigo-600">
+                              {index < currentExerciseIndex && (
+                                <>{exercise.reps}</>
+                              )}
+                              {index === currentExerciseIndex && (
+                                <>
+                                  {exerciseCount[exercise.name.toLowerCase()]}
+                                </>
+                              )}
+                              {(currentExerciseIndex === -1 ||
+                                index > currentExerciseIndex) && (
+                                <>
+                                  {exerciseCount[exercise.name.toLowerCase()]}
+                                </>
+                              )}
+                            </span>
+                            <span className="text-gray-400">
+                              /{exercise.reps}
+                            </span>
